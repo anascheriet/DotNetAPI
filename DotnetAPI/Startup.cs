@@ -1,17 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
+using AutoMapper;
 using DotnetAPI.Data;
 using DotnetAPI.Model;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DotnetAPI
 {
@@ -28,7 +27,33 @@ namespace DotnetAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<AppDbContext>(option => option.UseMySql(Configuration.GetConnectionString("MyConnection")));
-            services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<AppDbContext>();
+            IdentityBuilder builder = services.AddIdentityCore<AppUser>(
+
+                opt =>{
+                opt.Password.RequireDigit = false;
+                opt.Password.RequiredLength = 4;
+                opt.Password.RequireNonAlphanumeric = false;
+                opt.Password.RequireUppercase = false;
+                opt.Password.RequireLowercase = false;}
+            );
+            builder = new IdentityBuilder(builder.UserType, typeof(AppRole), builder.Services);
+            builder.AddEntityFrameworkStores<AppDbContext>();
+            builder.AddRoleValidator<RoleValidator<AppRole>>();
+            builder.AddRoleManager<RoleManager<AppRole>>();
+            builder.AddSignInManager<SignInManager<AppUser>>();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                        .AddJwtBearer(Options => {
+                        Options.TokenValidationParameters = new TokenValidationParameters{
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
+                                Configuration.GetSection("AppSettings:Token").Value)),
+                                ValidateIssuer = false,
+                                ValidateAudience = false
+                                };
+                        });
+            services.AddAutoMapper(typeof(Startup));
+            services.AddScoped<IGestionRepository, GestionRepository>();
             services.AddControllers();
         }
 
@@ -42,8 +67,9 @@ namespace DotnetAPI
 
             app.UseRouting();
 
-            app.UseAuthorization();
             app.UseAuthentication();
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

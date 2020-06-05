@@ -1,30 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\anasc\\source\\repos\\DotNetAPI-master\\DotnetAPI\\DotnetAPI.csproj": {}
+    "C:\\Users\\Ayman\\Desktop\\PROJECTS\\DotNetAPI\\DotnetAPI\\DotnetAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\anasc\\source\\repos\\DotNetAPI-master\\DotnetAPI\\DotnetAPI.csproj": {
+    "C:\\Users\\Ayman\\Desktop\\PROJECTS\\DotNetAPI\\DotnetAPI\\DotnetAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\anasc\\source\\repos\\DotNetAPI-master\\DotnetAPI\\DotnetAPI.csproj",
+        "projectUniqueName": "C:\\Users\\Ayman\\Desktop\\PROJECTS\\DotNetAPI\\DotnetAPI\\DotnetAPI.csproj",
         "projectName": "DotnetAPI",
-        "projectPath": "C:\\Users\\anasc\\source\\repos\\DotNetAPI-master\\DotnetAPI\\DotnetAPI.csproj",
-        "packagesPath": "C:\\Users\\anasc\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\anasc\\source\\repos\\DotNetAPI-master\\DotnetAPI\\obj\\",
+        "projectPath": "C:\\Users\\Ayman\\Desktop\\PROJECTS\\DotNetAPI\\DotnetAPI\\DotnetAPI.csproj",
+        "packagesPath": "C:\\Users\\Ayman\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Ayman\\Desktop\\PROJECTS\\DotNetAPI\\DotnetAPI\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\PROGRAM FILES\\DOTNET\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\anasc\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Ayman\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -41,7 +36,21 @@
       "frameworks": {
         "netcoreapp3.1": {
           "dependencies": {
+            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[3.1.4, )"
+            },
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[3.1.4, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
               "target": "Package",
               "version": "[3.1.4, )"
             },
@@ -82,7 +91,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\PROGRAM FILES\\DOTNET\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.300\\RuntimeIdentifierGraph.json"
         }
       }
     }

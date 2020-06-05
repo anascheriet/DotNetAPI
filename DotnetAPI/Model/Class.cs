@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace DotnetAPI.Model
 {
@@ -10,12 +6,18 @@ namespace DotnetAPI.Model
     {
         public int ClassId { get; set; }
         public string Name { get; set; }
-        public string Grade { get; set; }
         public string Branch { get; set; }
+        public string Grade { get; set; }
+        public string InvitationCode { get; set; }
+        public ICollection<ClassPending> WaitingList { get; set; }
+        public int AppUserId { get; set; }
+        public ICollection<Publication> publications { get; set; }
 
-        [ForeignKey("UserId")]
-        public virtual AppUser AppUserIDAppUserNavigation { get; set; }
+        public Class()
+        {
+            //Generate random code
+            InvitationCode = "SecretRandomCode";
+        }
 
-        public virtual ICollection<Publication> Publication { get; set; }
     }
 }

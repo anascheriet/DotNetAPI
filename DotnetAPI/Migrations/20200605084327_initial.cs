@@ -12,7 +12,8 @@ namespace DotnetAPI.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(nullable: true)
@@ -26,7 +27,8 @@ namespace DotnetAPI.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UserName = table.Column<string>(maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(maxLength: 256, nullable: true),
                     Email = table.Column<string>(maxLength: 256, nullable: true),
@@ -41,8 +43,8 @@ namespace DotnetAPI.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
-                    Nom = table.Column<string>(nullable: true),
-                    Prenom = table.Column<string>(nullable: true),
+                    LName = table.Column<string>(nullable: true),
+                    FName = table.Column<string>(nullable: true),
                     Status = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -56,7 +58,7 @@ namespace DotnetAPI.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    RoleId = table.Column<string>(nullable: false),
+                    RoleId = table.Column<int>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true)
                 },
@@ -77,7 +79,7 @@ namespace DotnetAPI.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    UserId = table.Column<string>(nullable: false),
+                    UserId = table.Column<int>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true)
                 },
@@ -99,7 +101,7 @@ namespace DotnetAPI.Migrations
                     LoginProvider = table.Column<string>(nullable: false),
                     ProviderKey = table.Column<string>(nullable: false),
                     ProviderDisplayName = table.Column<string>(nullable: true),
-                    UserId = table.Column<string>(nullable: false)
+                    UserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -116,8 +118,8 @@ namespace DotnetAPI.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(nullable: false),
-                    RoleId = table.Column<string>(nullable: false)
+                    UserId = table.Column<int>(nullable: false),
+                    RoleId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -140,7 +142,7 @@ namespace DotnetAPI.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(nullable: false),
+                    UserId = table.Column<int>(nullable: false),
                     LoginProvider = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: false),
                     Value = table.Column<string>(nullable: true)
@@ -157,46 +159,107 @@ namespace DotnetAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Classes",
+                name: "classes",
                 columns: table => new
                 {
                     ClassId = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
-                    Grade = table.Column<string>(nullable: true),
                     Branch = table.Column<string>(nullable: true),
-                    UserId = table.Column<string>(nullable: true)
+                    Grade = table.Column<string>(nullable: true),
+                    InvitationCode = table.Column<string>(nullable: true),
+                    AppUserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Classes", x => x.ClassId);
+                    table.PrimaryKey("PK_classes", x => x.ClassId);
                     table.ForeignKey(
-                        name: "FK_Classes_AspNetUsers_UserId",
-                        column: x => x.UserId,
+                        name: "FK_classes_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Publications",
+                name: "classpendings",
+                columns: table => new
+                {
+                    ClassId = table.Column<int>(nullable: false),
+                    AppUserId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_classpendings", x => new { x.ClassId, x.AppUserId });
+                    table.ForeignKey(
+                        name: "FK_classpendings_classes_ClassId",
+                        column: x => x.ClassId,
+                        principalTable: "classes",
+                        principalColumn: "ClassId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "publications",
                 columns: table => new
                 {
                     PublicationId = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Contenu = table.Column<string>(nullable: true),
+                    Content = table.Column<string>(nullable: true),
                     DatePublication = table.Column<DateTime>(nullable: false),
-                    ClassId = table.Column<int>(nullable: true)
+                    ClassId = table.Column<int>(nullable: false),
+                    AppUserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Publications", x => x.PublicationId);
+                    table.PrimaryKey("PK_publications", x => x.PublicationId);
                     table.ForeignKey(
-                        name: "FK_Publications_Classes_ClassId",
+                        name: "FK_publications_classes_ClassId",
                         column: x => x.ClassId,
-                        principalTable: "Classes",
+                        principalTable: "classes",
                         principalColumn: "ClassId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "attachements",
+                columns: table => new
+                {
+                    AttachementId = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    path = table.Column<string>(nullable: true),
+                    PublicationId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_attachements", x => x.AttachementId);
+                    table.ForeignKey(
+                        name: "FK_attachements_publications_PublicationId",
+                        column: x => x.PublicationId,
+                        principalTable: "publications",
+                        principalColumn: "PublicationId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "comments",
+                columns: table => new
+                {
+                    CommentId = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Content = table.Column<string>(nullable: true),
+                    AppUserId = table.Column<int>(nullable: false),
+                    PublicationId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_comments", x => x.CommentId);
+                    table.ForeignKey(
+                        name: "FK_comments_publications_PublicationId",
+                        column: x => x.PublicationId,
+                        principalTable: "publications",
+                        principalColumn: "PublicationId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -237,13 +300,23 @@ namespace DotnetAPI.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Classes_UserId",
-                table: "Classes",
-                column: "UserId");
+                name: "IX_attachements_PublicationId",
+                table: "attachements",
+                column: "PublicationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Publications_ClassId",
-                table: "Publications",
+                name: "IX_classes_AppUserId",
+                table: "classes",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_comments_PublicationId",
+                table: "comments",
+                column: "PublicationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_publications_ClassId",
+                table: "publications",
                 column: "ClassId");
         }
 
@@ -265,13 +338,22 @@ namespace DotnetAPI.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Publications");
+                name: "attachements");
+
+            migrationBuilder.DropTable(
+                name: "classpendings");
+
+            migrationBuilder.DropTable(
+                name: "comments");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Classes");
+                name: "publications");
+
+            migrationBuilder.DropTable(
+                name: "classes");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

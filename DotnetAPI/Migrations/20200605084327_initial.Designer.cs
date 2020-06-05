@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DotnetAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200516010500_initial")]
+    [Migration("20200605084327_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,8 +21,9 @@ namespace DotnetAPI.Migrations
 
             modelBuilder.Entity("DotnetAPI.Model.AppRole", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -47,8 +48,9 @@ namespace DotnetAPI.Migrations
 
             modelBuilder.Entity("DotnetAPI.Model.AppUser", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -64,14 +66,17 @@ namespace DotnetAPI.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<string>("FName")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("LName")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Nom")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<string>("NormalizedEmail")
                         .HasColumnType("varchar(256) CHARACTER SET utf8mb4")
@@ -89,9 +94,6 @@ namespace DotnetAPI.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("Prenom")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
@@ -118,10 +120,32 @@ namespace DotnetAPI.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("DotnetAPI.Model.Attachement", b =>
+                {
+                    b.Property<int>("AttachementId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("PublicationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("path")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.HasKey("AttachementId");
+
+                    b.HasIndex("PublicationId");
+
+                    b.ToTable("attachements");
+                });
+
             modelBuilder.Entity("DotnetAPI.Model.Class", b =>
                 {
                     b.Property<int>("ClassId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("AppUserId")
                         .HasColumnType("int");
 
                     b.Property<string>("Branch")
@@ -130,17 +154,52 @@ namespace DotnetAPI.Migrations
                     b.Property<string>("Grade")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
+                    b.Property<string>("InvitationCode")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
                     b.Property<string>("Name")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
-
                     b.HasKey("ClassId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("AppUserId");
 
-                    b.ToTable("Classes");
+                    b.ToTable("classes");
+                });
+
+            modelBuilder.Entity("DotnetAPI.Model.ClassPending", b =>
+                {
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ClassId", "AppUserId");
+
+                    b.ToTable("classpendings");
+                });
+
+            modelBuilder.Entity("DotnetAPI.Model.Comment", b =>
+                {
+                    b.Property<int>("CommentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<int>("PublicationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CommentId");
+
+                    b.HasIndex("PublicationId");
+
+                    b.ToTable("comments");
                 });
 
             modelBuilder.Entity("DotnetAPI.Model.Publication", b =>
@@ -149,10 +208,13 @@ namespace DotnetAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int?>("ClassId")
+                    b.Property<int>("AppUserId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Contenu")
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<DateTime>("DatePublication")
@@ -162,10 +224,10 @@ namespace DotnetAPI.Migrations
 
                     b.HasIndex("ClassId");
 
-                    b.ToTable("Publications");
+                    b.ToTable("publications");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -177,9 +239,8 @@ namespace DotnetAPI.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -188,7 +249,7 @@ namespace DotnetAPI.Migrations
                     b.ToTable("AspNetRoleClaims");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -200,9 +261,8 @@ namespace DotnetAPI.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -211,7 +271,7 @@ namespace DotnetAPI.Migrations
                     b.ToTable("AspNetUserClaims");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
@@ -222,9 +282,8 @@ namespace DotnetAPI.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -233,13 +292,13 @@ namespace DotnetAPI.Migrations
                     b.ToTable("AspNetUserLogins");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("RoleId")
-                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -248,10 +307,10 @@ namespace DotnetAPI.Migrations
                     b.ToTable("AspNetUserRoles");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.Property<string>("LoginProvider")
                         .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
@@ -267,21 +326,52 @@ namespace DotnetAPI.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("DotnetAPI.Model.Attachement", b =>
+                {
+                    b.HasOne("DotnetAPI.Model.Publication", null)
+                        .WithMany("Attachements")
+                        .HasForeignKey("PublicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("DotnetAPI.Model.Class", b =>
                 {
-                    b.HasOne("DotnetAPI.Model.AppUser", "AppUserIDAppUserNavigation")
+                    b.HasOne("DotnetAPI.Model.AppUser", null)
                         .WithMany("Classes")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DotnetAPI.Model.ClassPending", b =>
+                {
+                    b.HasOne("DotnetAPI.Model.Class", null)
+                        .WithMany("WaitingList")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DotnetAPI.Model.Comment", b =>
+                {
+                    b.HasOne("DotnetAPI.Model.Publication", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("PublicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DotnetAPI.Model.Publication", b =>
                 {
                     b.HasOne("DotnetAPI.Model.Class", "ClassIdClassNavigation")
-                        .WithMany("Publication")
-                        .HasForeignKey("ClassId");
+                        .WithMany("publications")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("DotnetAPI.Model.AppRole", null)
                         .WithMany()
@@ -290,7 +380,7 @@ namespace DotnetAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
                     b.HasOne("DotnetAPI.Model.AppUser", null)
                         .WithMany()
@@ -299,7 +389,7 @@ namespace DotnetAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
                     b.HasOne("DotnetAPI.Model.AppUser", null)
                         .WithMany()
@@ -308,7 +398,7 @@ namespace DotnetAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
                     b.HasOne("DotnetAPI.Model.AppRole", null)
                         .WithMany()
@@ -323,7 +413,7 @@ namespace DotnetAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
                     b.HasOne("DotnetAPI.Model.AppUser", null)
                         .WithMany()
