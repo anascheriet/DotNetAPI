@@ -4,7 +4,7 @@ namespace DotnetAPI.Model
     {
         public int CommentId { get; set; }
         public string Content { get; set; }
-        public int AppUserId { get; set; }
-        public int PublicationId { get; set; }
+        public virtual AppUser Owner { get; set; }
+        public virtual Publication Publication { get; set; }
     }
 }

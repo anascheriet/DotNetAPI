@@ -251,3 +251,8 @@ C:\Users\Ayman\Desktop\PROJECTS\DotNetAPI\DotnetAPI\obj\Debug\netcoreapp3.1\stat
 C:\Users\Ayman\Desktop\PROJECTS\DotNetAPI\DotnetAPI\obj\Debug\netcoreapp3.1\DotnetAPI.dll
 C:\Users\Ayman\Desktop\PROJECTS\DotNetAPI\DotnetAPI\obj\Debug\netcoreapp3.1\DotnetAPI.pdb
 C:\Users\Ayman\Desktop\PROJECTS\DotNetAPI\DotnetAPI\obj\Debug\netcoreapp3.1\DotnetAPI.genruntimeconfig.cache
+C:\Users\Ayman\Desktop\PROJECTS\DotNetAPI\DotnetAPI\bin\Debug\netcoreapp3.1\Castle.Core.dll
+C:\Users\Ayman\Desktop\PROJECTS\DotNetAPI\DotnetAPI\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.Proxies.dll
+C:\Users\Ayman\Desktop\PROJECTS\DotNetAPI\DotnetAPI\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.JsonPatch.dll
+C:\Users\Ayman\Desktop\PROJECTS\DotNetAPI\DotnetAPI\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+C:\Users\Ayman\Desktop\PROJECTS\DotNetAPI\DotnetAPI\bin\Debug\netcoreapp3.1\Newtonsoft.Json.Bson.dll

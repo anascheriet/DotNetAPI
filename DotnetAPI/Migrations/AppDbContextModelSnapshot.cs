@@ -121,18 +121,12 @@ namespace DotnetAPI.Migrations
             modelBuilder.Entity("DotnetAPI.Model.Attachement", b =>
                 {
                     b.Property<int>("AttachementId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("PublicationId")
                         .HasColumnType("int");
 
                     b.Property<string>("path")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.HasKey("AttachementId");
-
-                    b.HasIndex("PublicationId");
 
                     b.ToTable("attachements");
                 });
@@ -141,9 +135,6 @@ namespace DotnetAPI.Migrations
                 {
                     b.Property<int>("ClassId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("AppUserId")
                         .HasColumnType("int");
 
                     b.Property<string>("Branch")
@@ -158,44 +149,48 @@ namespace DotnetAPI.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
+                    b.Property<int?>("OwnerId")
+                        .HasColumnType("int");
+
                     b.HasKey("ClassId");
 
-                    b.HasIndex("AppUserId");
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("classes");
                 });
 
-            modelBuilder.Entity("DotnetAPI.Model.ClassPending", b =>
+            modelBuilder.Entity("DotnetAPI.Model.ClassAppUser", b =>
                 {
-                    b.Property<int>("ClassId")
-                        .HasColumnType("int");
-
                     b.Property<int>("AppUserId")
                         .HasColumnType("int");
 
-                    b.HasKey("ClassId", "AppUserId");
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
 
-                    b.ToTable("classpendings");
+                    b.Property<bool>("verified")
+                        .HasColumnType("tinyint(1)");
+
+                    b.HasKey("AppUserId", "ClassId");
+
+                    b.HasIndex("ClassId");
+
+                    b.ToTable("ClassMembers");
                 });
 
             modelBuilder.Entity("DotnetAPI.Model.Comment", b =>
                 {
                     b.Property<int>("CommentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("AppUserId")
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
-                    b.Property<int>("PublicationId")
+                    b.Property<int?>("OwnerId")
                         .HasColumnType("int");
 
                     b.HasKey("CommentId");
 
-                    b.HasIndex("PublicationId");
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("comments");
                 });
@@ -203,13 +198,9 @@ namespace DotnetAPI.Migrations
             modelBuilder.Entity("DotnetAPI.Model.Publication", b =>
                 {
                     b.Property<int>("PublicationId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("AppUserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ClassId")
+                    b.Property<int?>("AppUserId")
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
@@ -220,7 +211,7 @@ namespace DotnetAPI.Migrations
 
                     b.HasKey("PublicationId");
 
-                    b.HasIndex("ClassId");
+                    b.HasIndex("AppUserId");
 
                     b.ToTable("publications");
                 });
@@ -326,26 +317,30 @@ namespace DotnetAPI.Migrations
 
             modelBuilder.Entity("DotnetAPI.Model.Attachement", b =>
                 {
-                    b.HasOne("DotnetAPI.Model.Publication", null)
+                    b.HasOne("DotnetAPI.Model.Publication", "Publication")
                         .WithMany("Attachements")
-                        .HasForeignKey("PublicationId")
+                        .HasForeignKey("AttachementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("DotnetAPI.Model.Class", b =>
                 {
-                    b.HasOne("DotnetAPI.Model.AppUser", null)
-                        .WithMany("Classes")
+                    b.HasOne("DotnetAPI.Model.AppUser", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId");
+                });
+
+            modelBuilder.Entity("DotnetAPI.Model.ClassAppUser", b =>
+                {
+                    b.HasOne("DotnetAPI.Model.AppUser", "AppUser")
+                        .WithMany("ClassMembers")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
 
-            modelBuilder.Entity("DotnetAPI.Model.ClassPending", b =>
-                {
-                    b.HasOne("DotnetAPI.Model.Class", null)
-                        .WithMany("WaitingList")
+                    b.HasOne("DotnetAPI.Model.Class", "Class")
+                        .WithMany("ClassMembers")
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -353,18 +348,26 @@ namespace DotnetAPI.Migrations
 
             modelBuilder.Entity("DotnetAPI.Model.Comment", b =>
                 {
-                    b.HasOne("DotnetAPI.Model.Publication", null)
+                    b.HasOne("DotnetAPI.Model.Publication", "Publication")
                         .WithMany("Comments")
-                        .HasForeignKey("PublicationId")
+                        .HasForeignKey("CommentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("DotnetAPI.Model.AppUser", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId");
                 });
 
             modelBuilder.Entity("DotnetAPI.Model.Publication", b =>
                 {
-                    b.HasOne("DotnetAPI.Model.Class", "ClassIdClassNavigation")
+                    b.HasOne("DotnetAPI.Model.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId");
+
+                    b.HasOne("DotnetAPI.Model.Class", "Class")
                         .WithMany("publications")
-                        .HasForeignKey("ClassId")
+                        .HasForeignKey("PublicationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

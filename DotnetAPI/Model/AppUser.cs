@@ -9,6 +9,6 @@ namespace DotnetAPI.Model
         public string FName { get; set; }
         public string Status { get; set; }
 
-        public ICollection<Class> Classes { get; set; }
+        public virtual ICollection<ClassAppUser> ClassMembers { get; set; }
     }
 }

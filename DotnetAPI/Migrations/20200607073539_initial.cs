@@ -168,31 +168,38 @@ namespace DotnetAPI.Migrations
                     Branch = table.Column<string>(nullable: true),
                     Grade = table.Column<string>(nullable: true),
                     InvitationCode = table.Column<string>(nullable: true),
-                    AppUserId = table.Column<int>(nullable: false)
+                    OwnerId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_classes", x => x.ClassId);
                     table.ForeignKey(
-                        name: "FK_classes_AspNetUsers_AppUserId",
+                        name: "FK_classes_AspNetUsers_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ClassMembers",
+                columns: table => new
+                {
+                    ClassId = table.Column<int>(nullable: false),
+                    AppUserId = table.Column<int>(nullable: false),
+                    verified = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClassMembers", x => new { x.AppUserId, x.ClassId });
+                    table.ForeignKey(
+                        name: "FK_ClassMembers_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "classpendings",
-                columns: table => new
-                {
-                    ClassId = table.Column<int>(nullable: false),
-                    AppUserId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_classpendings", x => new { x.ClassId, x.AppUserId });
                     table.ForeignKey(
-                        name: "FK_classpendings_classes_ClassId",
+                        name: "FK_ClassMembers_classes_ClassId",
                         column: x => x.ClassId,
                         principalTable: "classes",
                         principalColumn: "ClassId",
@@ -203,19 +210,23 @@ namespace DotnetAPI.Migrations
                 name: "publications",
                 columns: table => new
                 {
-                    PublicationId = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    PublicationId = table.Column<int>(nullable: false),
                     Content = table.Column<string>(nullable: true),
                     DatePublication = table.Column<DateTime>(nullable: false),
-                    ClassId = table.Column<int>(nullable: false),
-                    AppUserId = table.Column<int>(nullable: false)
+                    AppUserId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_publications", x => x.PublicationId);
                     table.ForeignKey(
-                        name: "FK_publications_classes_ClassId",
-                        column: x => x.ClassId,
+                        name: "FK_publications_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_publications_classes_PublicationId",
+                        column: x => x.PublicationId,
                         principalTable: "classes",
                         principalColumn: "ClassId",
                         onDelete: ReferentialAction.Cascade);
@@ -225,17 +236,15 @@ namespace DotnetAPI.Migrations
                 name: "attachements",
                 columns: table => new
                 {
-                    AttachementId = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    path = table.Column<string>(nullable: true),
-                    PublicationId = table.Column<int>(nullable: false)
+                    AttachementId = table.Column<int>(nullable: false),
+                    path = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_attachements", x => x.AttachementId);
                     table.ForeignKey(
-                        name: "FK_attachements_publications_PublicationId",
-                        column: x => x.PublicationId,
+                        name: "FK_attachements_publications_AttachementId",
+                        column: x => x.AttachementId,
                         principalTable: "publications",
                         principalColumn: "PublicationId",
                         onDelete: ReferentialAction.Cascade);
@@ -245,21 +254,25 @@ namespace DotnetAPI.Migrations
                 name: "comments",
                 columns: table => new
                 {
-                    CommentId = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    CommentId = table.Column<int>(nullable: false),
                     Content = table.Column<string>(nullable: true),
-                    AppUserId = table.Column<int>(nullable: false),
-                    PublicationId = table.Column<int>(nullable: false)
+                    OwnerId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_comments", x => x.CommentId);
                     table.ForeignKey(
-                        name: "FK_comments_publications_PublicationId",
-                        column: x => x.PublicationId,
+                        name: "FK_comments_publications_CommentId",
+                        column: x => x.CommentId,
                         principalTable: "publications",
                         principalColumn: "PublicationId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_comments_AspNetUsers_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -300,24 +313,24 @@ namespace DotnetAPI.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_attachements_PublicationId",
-                table: "attachements",
-                column: "PublicationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_classes_AppUserId",
+                name: "IX_classes_OwnerId",
                 table: "classes",
-                column: "AppUserId");
+                column: "OwnerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_comments_PublicationId",
-                table: "comments",
-                column: "PublicationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_publications_ClassId",
-                table: "publications",
+                name: "IX_ClassMembers_ClassId",
+                table: "ClassMembers",
                 column: "ClassId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_comments_OwnerId",
+                table: "comments",
+                column: "OwnerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_publications_AppUserId",
+                table: "publications",
+                column: "AppUserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -341,7 +354,7 @@ namespace DotnetAPI.Migrations
                 name: "attachements");
 
             migrationBuilder.DropTable(
-                name: "classpendings");
+                name: "ClassMembers");
 
             migrationBuilder.DropTable(
                 name: "comments");
