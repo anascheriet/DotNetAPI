@@ -12,8 +12,9 @@ namespace DotnetAPI.Model
         public string Grade { get; set; }
         public string InvitationCode { get; set; }
         public virtual ICollection<ClassAppUser> ClassMembers { get; set; }
+        public int OwnerId { get; set; }
         public virtual AppUser Owner { get; set; }
-        public virtual ICollection<Publication> publications { get; set; }
+        public virtual ICollection<Publication> Publications { get; set; }
 
         public Class()
         {
@@ -29,7 +30,7 @@ namespace DotnetAPI.Model
             }
 
             InvitationCode = new String(stringChars);
-            
+
         }
 
     }

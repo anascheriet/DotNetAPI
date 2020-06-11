@@ -22,29 +22,29 @@ namespace DotnetAPI.Data
 
         public async Task<bool> Save()
         {
-                return (await _db.SaveChangesAsync() > 0);
+            return (await _db.SaveChangesAsync() > 0);
         }
 
         public void Delete<T>(T entity) where T : class
         {
-                _db.Remove(entity);
+            _db.Remove(entity);
         }
 
-//Class Gets
+        //Class Gets
         public async Task<IEnumerable<Class>> GetClasses(int userid)
         {
             var query = from cm in _db.ClassMembers
-            join cl in _db.classes
-            on cm.ClassId equals cl.ClassId
-            join usr in _db.Users
-            on cm.AppUserId equals usr.Id
-            where cm.AppUserId == userid
-            select cl;
+                        join cl in _db.classes
+                        on cm.ClassId equals cl.ClassId
+                        join usr in _db.Users
+                        on cm.MemberId equals usr.Id
+                        where cm.MemberId == userid
+                        select cl;
             return await query.ToListAsync();
         }
         public async Task<Class> GetClass(int classid)
         {
-            return  await _db.classes.FirstOrDefaultAsync(c => c.ClassId == classid);
+            return await _db.classes.FirstOrDefaultAsync(c => c.ClassId == classid);
         }
         public async Task<Class> GetClassByCode(string code)
         {
@@ -64,19 +64,49 @@ namespace DotnetAPI.Data
         public async Task<IEnumerable<AppUser>> GetClassMembers(int classid)
         {
             var query = from cm in _db.ClassMembers
-            join cl in _db.classes
-            on cm.ClassId equals cl.ClassId
-            join usr in _db.Users
-            on cm.AppUserId equals usr.Id
-            where cm.ClassId == classid
-            select usr;
+                        join cl in _db.classes
+                        on cm.ClassId equals cl.ClassId
+                        join usr in _db.Users
+                        on cm.MemberId equals usr.Id
+                        where cm.ClassId == classid
+                        select usr;
             return await query.ToListAsync();
 
         }
 
         public async Task<ClassAppUser> GetClassMemberRelation(int userid, int classid)
         {
-            return await _db.ClassMembers.FirstOrDefaultAsync(cm => cm.AppUserId == userid && cm.ClassId == classid);
+            return await _db.ClassMembers.FirstOrDefaultAsync(cm => cm.MemberId == userid && cm.ClassId == classid);
+        }
+
+        public async Task<IEnumerable<Publication>> GetPublications(int classid)
+        {
+            return await _db.publications.Where(p => p.ClassId == classid).ToListAsync();
+        }
+
+        public async Task<Publication> GetPublication(int pubid)
+        {
+            return await _db.publications.FirstOrDefaultAsync(pub => pub.PublicationId == pubid);
+        }
+
+        public async Task<IEnumerable<Attachment>> GetAttachments(int pubid)
+        {
+            return await _db.attachements.Where(at => at.PublicationId == pubid).ToListAsync();
+        }
+
+        public async Task<Attachment> GetAttachment(int attachementid)
+        {
+            return await _db.attachements.FirstOrDefaultAsync(at => at.AttachmentId == attachementid);
+        }
+
+        public async Task<IEnumerable<Comment>> GetComments(int pubid)
+        {
+            return await _db.comments.Where(com => com.PublicationId == pubid).ToListAsync();
+        }
+
+        public async Task<Comment> GetComment(int Commentid)
+        {
+            return await _db.comments.FirstOrDefaultAsync(com => com.CommentId == Commentid);
         }
     }
 }

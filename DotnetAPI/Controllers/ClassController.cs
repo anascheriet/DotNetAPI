@@ -21,13 +21,13 @@ namespace DotnetAPI.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
 
-        public ClassController(IGestionRepository repo,UserManager<AppUser> userManager, IMapper mapper)
+        public ClassController(IGestionRepository repo, UserManager<AppUser> userManager, IMapper mapper)
         {
             _repo = repo;
             _userManager = userManager;
             _mapper = mapper;
         }
-        
+
 
         [HttpGet]
         public async Task<IActionResult> getClasses()
@@ -38,8 +38,8 @@ namespace DotnetAPI.Controllers
             var classesToReturn = _mapper.Map<List<ClassForListDto>>(classes);
             return Ok(classesToReturn);
         }
-        
-        
+
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> getClass(int id)
@@ -52,40 +52,41 @@ namespace DotnetAPI.Controllers
         [HttpGet("{id}/members")]
         public async Task<IActionResult> getClassMembers(int id)
         {
-            
+
             var members = await _repo.GetClassMembers(id);
             var membersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(members);
             return Ok(membersToReturn);
         }
 
         [HttpPost("{classid}/transfer/{userid}")]
-        public async Task<IActionResult> TransferOwnership(int classid,int userid)
+        public async Task<IActionResult> TransferOwnership(int classid, int userid)
         {
-            
+
             var classe = await _repo.GetClass(classid);
             var user = await _repo.GetUser(userid);
 
             classe.Owner = user;
             await _repo.Save();
-            
+
             return Ok("Transfered successfully !");
         }
 
         [HttpPost("Add")]
-        public async Task<IActionResult> AjouterClasse(ClassForCrudDto classForCrudDto) /// IL faut créer un DTO 
+        public async Task<IActionResult> AjouterClasse(ClassForCrudDto classForCrudDto)
         {
-            var classe =  _mapper.Map<Class>(classForCrudDto);
-            classe.Owner =  _userManager.GetUserAsync(HttpContext.User).Result;
+            var classe = _mapper.Map<Class>(classForCrudDto);
+            classe.Owner = _userManager.GetUserAsync(HttpContext.User).Result;
             _repo.Add(classe);
-            var classmember = new ClassAppUser {
+            var classmember = new ClassAppUser
+            {
                 Class = classe,
-                AppUser = classe.Owner,
+                Member = classe.Owner,
                 verified = true
             };
             _repo.Add(classmember);
 
 
-            if(await _repo.Save()) return Ok("Class added successfully !");
+            if (await _repo.Save()) return Ok("Class added successfully !");
             return BadRequest("ERROR, Problem occured while adding you to the class members");
         }
 
@@ -96,21 +97,22 @@ namespace DotnetAPI.Controllers
             var user = await _userManager.GetUserAsync(HttpContext.User);
             var classe = _repo.GetClassByCode(code).Result;
 
-            _repo.Add(new ClassAppUser{
-                AppUser = user,
+            _repo.Add(new ClassAppUser
+            {
+                Member = user,
                 Class = classe
             });
 
-            if(await _repo.Save()) return Ok("Joining Request sent, please wait for your teacher to accept !");
+            if (await _repo.Save()) return Ok("Joining Request sent, please wait for your teacher to accept !");
             return BadRequest("ERROR, Problem occured while adding you to the class members");
         }
 
         [HttpPost("{classid}/kick/{userid}")]
         public async Task<IActionResult> kickClassMember(int userid, int classid)
         {
-            _repo.Delete(await _repo.GetClassMemberRelation(userid,classid));
+            _repo.Delete(await _repo.GetClassMemberRelation(userid, classid));
 
-            if(await _repo.Save()) return Ok("Member kicked from your class successfully !");
+            if (await _repo.Save()) return Ok("Member kicked from your class successfully !");
             return BadRequest("ERROR, Problem occured while kicking member from your class");
         }
 
@@ -119,7 +121,7 @@ namespace DotnetAPI.Controllers
         {
             _repo.Delete(await _repo.GetClass(classid));
 
-            if(await _repo.Save()) return Ok("Class deleted successfully !");
+            if (await _repo.Save()) return Ok("Class deleted successfully !");
             return BadRequest("ERROR, Problem occured while deleting the class");
         }
 
@@ -127,11 +129,11 @@ namespace DotnetAPI.Controllers
         public async Task<IActionResult> Edit(int classid, ClassForCrudDto classForCrudDto)
         {
             var classe = await _repo.GetClass(classid);
-            _mapper.Map(classForCrudDto,classe);
-            
-            if(await _repo.Save()) return Ok("Class Modified successfully !");
+            _mapper.Map(classForCrudDto, classe);
+
+            if (await _repo.Save()) return Ok("Class Modified successfully !");
             return BadRequest("ERROR, Problem occured while modifying the class");
         }
-        
+
     }
 }

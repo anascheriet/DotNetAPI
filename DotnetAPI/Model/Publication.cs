@@ -8,11 +8,13 @@ namespace DotnetAPI.Model
     {
         public int PublicationId { get; set; }
         public string Content { get; set; }
-        public virtual ICollection<Attachement> Attachements { get; set; } //Image, Video, File...
+        public virtual ICollection<Attachment> Attachements { get; set; } //Image, Video, File...
         public virtual ICollection<Comment> Comments { get; set; }
         public DateTime DatePublication { get; set; }
+        public int ClassId { get; set; }
         public virtual Class Class { get; set; }
-        public virtual AppUser AppUser { get; set; } //Owner of publication
+        public int OwnerId { get; set; }
+        public virtual AppUser Owner { get; set; } //Owner of publication
 
         public Publication()
         {
