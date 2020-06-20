@@ -29,12 +29,14 @@ namespace DotnetAPI
             services.AddDbContext<AppDbContext>(option => option.UseMySql(Configuration.GetConnectionString("MyConnection")));
             IdentityBuilder builder = services.AddIdentityCore<AppUser>(
 
-                opt =>{
-                opt.Password.RequireDigit = false;
-                opt.Password.RequiredLength = 4;
-                opt.Password.RequireNonAlphanumeric = false;
-                opt.Password.RequireUppercase = false;
-                opt.Password.RequireLowercase = false;}
+                opt =>
+                {
+                    opt.Password.RequireDigit = false;
+                    opt.Password.RequiredLength = 4;
+                    opt.Password.RequireNonAlphanumeric = false;
+                    opt.Password.RequireUppercase = false;
+                    opt.Password.RequireLowercase = false;
+                }
             );
             builder = new IdentityBuilder(builder.UserType, typeof(AppRole), builder.Services);
             builder.AddEntityFrameworkStores<AppDbContext>();
@@ -43,19 +45,22 @@ namespace DotnetAPI
             builder.AddSignInManager<SignInManager<AppUser>>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                        .AddJwtBearer(Options => {
-                        Options.TokenValidationParameters = new TokenValidationParameters{
-                            ValidateIssuerSigningKey = true,
-                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
-                                Configuration.GetSection("AppSettings:Token").Value)),
+                        .AddJwtBearer(Options =>
+                        {
+                            Options.TokenValidationParameters = new TokenValidationParameters
+                            {
+                                ValidateIssuerSigningKey = true,
+                                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
+                                    Configuration.GetSection("AppSettings:Token").Value)),
                                 ValidateIssuer = false,
                                 ValidateAudience = false
-                                };
+                            };
                         });
             services.AddAutoMapper(typeof(Startup));
             services.AddScoped<IGestionRepository, GestionRepository>();
             services.AddControllers().AddNewtonsoftJson(x =>
               x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,6 +76,7 @@ namespace DotnetAPI
             app.UseAuthentication();
 
             app.UseAuthorization();
+            app.UseCors(c => c.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             app.UseEndpoints(endpoints =>
             {

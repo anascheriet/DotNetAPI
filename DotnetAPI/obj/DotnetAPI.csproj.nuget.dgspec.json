@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Ayman\\Desktop\\PROJECTS\\DotNetAPI\\DotnetAPI\\DotnetAPI.csproj": {}
+    "/home/aymanelya/Desktop/projects/DotNetAPI/DotnetAPI/DotnetAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Ayman\\Desktop\\PROJECTS\\DotNetAPI\\DotnetAPI\\DotnetAPI.csproj": {
+    "/home/aymanelya/Desktop/projects/DotNetAPI/DotnetAPI/DotnetAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Ayman\\Desktop\\PROJECTS\\DotNetAPI\\DotnetAPI\\DotnetAPI.csproj",
+        "projectUniqueName": "/home/aymanelya/Desktop/projects/DotNetAPI/DotnetAPI/DotnetAPI.csproj",
         "projectName": "DotnetAPI",
-        "projectPath": "C:\\Users\\Ayman\\Desktop\\PROJECTS\\DotNetAPI\\DotnetAPI\\DotnetAPI.csproj",
-        "packagesPath": "C:\\Users\\Ayman\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Ayman\\Desktop\\PROJECTS\\DotNetAPI\\DotnetAPI\\obj\\",
+        "projectPath": "/home/aymanelya/Desktop/projects/DotNetAPI/DotnetAPI/DotnetAPI.csproj",
+        "packagesPath": "/home/aymanelya/.nuget/packages/",
+        "outputPath": "/home/aymanelya/Desktop/projects/DotNetAPI/DotnetAPI/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Ayman\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/home/aymanelya/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
@@ -46,7 +46,7 @@
             },
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[3.1.4, )"
+              "version": "[3.1.5, )"
             },
             "Microsoft.AspNetCore.Mvc.NewtonsoftJson": {
               "target": "Package",
@@ -99,7 +99,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.300\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/3.1.301/RuntimeIdentifierGraph.json"
         }
       }
     }
