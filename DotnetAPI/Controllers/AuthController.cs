@@ -18,7 +18,7 @@ namespace DotnetAPI.Controllers
 
     [ApiController]
     [Route("[controller]")]
-    public class AuthController: ControllerBase
+    public class AuthController : ControllerBase
     {
 
         private readonly UserManager<AppUser> _userManager;
@@ -29,11 +29,11 @@ namespace DotnetAPI.Controllers
 
         private readonly IConfiguration _config;
 
-        public AuthController(UserManager<AppUser> userManager, 
+        public AuthController(UserManager<AppUser> userManager,
         IMapper mapper, RoleManager<AppRole> roleManager,
         SignInManager<AppUser> signInManager,
         IConfiguration config,
-        IGestionRepository repo )
+        IGestionRepository repo)
         {
             _userManager = userManager;
             _mapper = mapper;
@@ -51,42 +51,49 @@ namespace DotnetAPI.Controllers
                 new AppRole{Name = "Student"}
             };
 
-            foreach(var role in roles)
+
+
+            foreach (var role in roles)
             {
-                await _roleManager.CreateAsync(role);
+                if (!_roleManager.RoleExistsAsync(role.Name).Result)
+                {
+                    await _roleManager.CreateAsync(role);
+                }
             }
 
             var user = _mapper.Map<AppUser>(userForRegisterDto);
 
-          var result =   await _userManager.CreateAsync(user, userForRegisterDto.password);
-          if(result.Succeeded)
-          {
-              if(user.Status =="prof" || user.Status == "Prof")
-              {
-                await _userManager.AddToRoleAsync(user, roles[0].Name); 
-              }
-              else{
-                  await _userManager.AddToRoleAsync(user, roles[1].Name); 
-              }
-              
-              return Ok("Registred Successfully");
-          }
-          return BadRequest(result.Errors);
+            var result = await _userManager.CreateAsync(user, userForRegisterDto.password);
+            if (result.Succeeded)
+            {
+                if (user.Status == "prof" || user.Status == "Prof")
+                {
+                    await _userManager.AddToRoleAsync(user, roles[0].Name);
+                }
+                else
+                {
+                    await _userManager.AddToRoleAsync(user, roles[1].Name);
+                }
+
+                return Ok("Registred Successfully");
+            }
+            return BadRequest(result.Errors);
 
         }
-        
-    [HttpPost("login")]
-       public async Task<IActionResult> Login(UserForLoginDto userForLogin)
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(UserForLoginDto userForLogin)
         {
             var user = await _userManager.FindByNameAsync(userForLogin.UserName);
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, userForLogin.password,false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, userForLogin.password, false);
 
-            if(result.Succeeded)
+            if (result.Succeeded)
             {
                 var roles = await _userManager.GetRolesAsync(user);
                 return Ok(
-                    new {
+                    new
+                    {
                         token = GenerateToken(user, roles)
                     }
                     );
@@ -100,7 +107,7 @@ namespace DotnetAPI.Controllers
         public async Task<IActionResult> getUsers()
         {
             var users = await _repo.GetUsers();
-            if(users == null)return Ok("Error, Users not found !\n Please register and try again!");
+            if (users == null) return Ok("Error, Users not found !\n Please register and try again!");
             var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
             return Ok(usersToReturn);
         }
@@ -108,7 +115,7 @@ namespace DotnetAPI.Controllers
         public async Task<IActionResult> getUser(int id)
         {
             var user = await _repo.GetUser(id);
-            if(user == null)return Ok("Error, User with the id "+id+" doesn't exist !");
+            if (user == null) return Ok("Error, User with the id " + id + " doesn't exist !");
             var userToReturn = _mapper.Map<UserForListDto>(user);
             return Ok(userToReturn);
         }
@@ -117,42 +124,44 @@ namespace DotnetAPI.Controllers
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
             var classes = await _repo.GetClasses(user.Id);
-            foreach(var c in classes)
+            foreach (var c in classes)
             {
                 _repo.Delete(c);
             }
             _repo.Delete(user);
             await _repo.Save();
-            return Ok("Deleted "+user.FName+" "+user.LName+" Successfully !");
+            return Ok("Deleted " + user.FName + " " + user.LName + " Successfully !");
         }
 
         [HttpPost("Edit")]
         public async Task<IActionResult> editUser(UserForEditDto userForEditDto)
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            _mapper.Map(userForEditDto,user);
+            _mapper.Map(userForEditDto, user);
 
             await _repo.Save();
             return Ok("Modified Successfully !");
         }
 
-          private string GenerateToken(AppUser user, IList<string> roles){
+        private string GenerateToken(AppUser user, IList<string> roles)
+        {
 
-                var claims = new List<Claim>
+            var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.UserName)     
+                    new Claim(ClaimTypes.Name, user.UserName)
                 };
 
-                foreach(var role in roles)
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, role));
-                }
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
-            var tokenDescriptor = new SecurityTokenDescriptor{
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
                 Subject = new ClaimsIdentity(claims),
                 SigningCredentials = creds,
                 Expires = DateTime.Now.AddDays(1)
@@ -163,10 +172,10 @@ namespace DotnetAPI.Controllers
 
             return tokenHandler.WriteToken(token);
 
-        } 
+        }
 
 
     }
 
-   
+
 }
