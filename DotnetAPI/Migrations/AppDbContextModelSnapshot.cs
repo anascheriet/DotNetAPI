@@ -14,7 +14,7 @@ namespace DotnetAPI.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.4")
+                .HasAnnotation("ProductVersion", "3.1.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("DotnetAPI.Model.AppRole", b =>
@@ -191,6 +191,9 @@ namespace DotnetAPI.Migrations
 
                     b.Property<string>("Content")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<DateTime>("DateComment")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("OwnerId")
                         .HasColumnType("int");

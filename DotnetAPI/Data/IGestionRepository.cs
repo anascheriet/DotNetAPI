@@ -14,6 +14,7 @@ namespace DotnetAPI.Data
         Task<IEnumerable<Class>> GetClasses(int userid);
         Task<Class> GetClass(int classid);
         Task<IEnumerable<AppUser>> GetClassMembers(int classid);
+        Task<IEnumerable<AppUser>> GetPendingMembers(int classid);
         Task<ClassAppUser> GetClassMemberRelation(int userid, int classid);
         Task<Class> GetClassByCode(string code);
         //User methods
@@ -29,5 +30,6 @@ namespace DotnetAPI.Data
         //Comment Methods
         Task<IEnumerable<Comment>> GetComments(int pubid);
         Task<Comment> GetComment(int Commentid);
+
     }
 }

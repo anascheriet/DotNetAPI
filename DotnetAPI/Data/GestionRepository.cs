@@ -33,7 +33,9 @@ namespace DotnetAPI.Data
         //Class Gets
         public async Task<IEnumerable<Class>> GetClasses(int userid)
         {
-            var query = from cm in _db.ClassMembers
+            var verifiedMembers = _db.ClassMembers.Where(cm => cm.verified == true);
+
+            var query = from cm in verifiedMembers
                         join cl in _db.classes
                         on cm.ClassId equals cl.ClassId
                         join usr in _db.Users
@@ -63,17 +65,27 @@ namespace DotnetAPI.Data
 
         public async Task<IEnumerable<AppUser>> GetClassMembers(int classid)
         {
-            var query = from cm in _db.ClassMembers
-                        join cl in _db.classes
-                        on cm.ClassId equals cl.ClassId
+            var verifiedMembers = _db.ClassMembers.Where(cm => cm.ClassId == classid && cm.verified == true);
+            var query = from vm in verifiedMembers
                         join usr in _db.Users
-                        on cm.MemberId equals usr.Id
-                        where cm.ClassId == classid
+                        on vm.MemberId equals usr.Id
+                        where vm.ClassId == classid
                         select usr;
             return await query.ToListAsync();
 
         }
+        public async Task<IEnumerable<AppUser>> GetPendingMembers(int classid)
+        {
+            var pendingMembers = _db.ClassMembers.Where(cm => cm.ClassId == classid && cm.verified == false);
+            var query = from pm in pendingMembers
+                        join usr in _db.Users
+                        on pm.MemberId equals usr.Id
+                        where pm.ClassId == classid
+                        select usr;
+            return await query.ToListAsync();
 
+
+        }
         public async Task<ClassAppUser> GetClassMemberRelation(int userid, int classid)
         {
             return await _db.ClassMembers.FirstOrDefaultAsync(cm => cm.MemberId == userid && cm.ClassId == classid);
@@ -108,5 +120,7 @@ namespace DotnetAPI.Data
         {
             return await _db.comments.FirstOrDefaultAsync(com => com.CommentId == Commentid);
         }
+
+
     }
 }

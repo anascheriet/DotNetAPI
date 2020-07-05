@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DotnetAPI.Model;
 
 namespace DotnetAPI.Dto
@@ -10,5 +11,9 @@ namespace DotnetAPI.Dto
         public string Grade { get; set; }
         public string InvitationCode { get; set; }
         public UserForListDto Owner { get; set; }
+        public ICollection<UserForListDto> Members { get; set; }
+        public ICollection<UserForListDto> Pending { get; set; }
+
+
     }
 }

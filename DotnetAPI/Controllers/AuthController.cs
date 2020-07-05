@@ -12,6 +12,9 @@ using Microsoft.IdentityModel.Tokens;
 using DotnetAPI.Dto;
 using DotnetAPI.Model;
 using DotnetAPI.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace DotnetAPI.Controllers
 {
@@ -42,7 +45,6 @@ namespace DotnetAPI.Controllers
             _config = config;
             _repo = repo;
         }
-
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserForRegisterDto userForRegisterDto)
         {
@@ -84,7 +86,12 @@ namespace DotnetAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLogin)
         {
+
             var user = await _userManager.FindByNameAsync(userForLogin.UserName);
+            if (user == null)
+            {
+                throw new Exception("Username not found");
+            }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, userForLogin.password, false);
 
@@ -99,10 +106,10 @@ namespace DotnetAPI.Controllers
                     );
             }
 
-            return BadRequest("Username or password are incorrect !");
+            throw new Exception("password is incorrect");
 
         }
-
+        [Authorize]
         [HttpGet("Users")]
         public async Task<IActionResult> getUsers()
         {
@@ -119,10 +126,10 @@ namespace DotnetAPI.Controllers
             var userToReturn = _mapper.Map<UserForListDto>(user);
             return Ok(userToReturn);
         }
-        [HttpPost("Delete")]
-        public async Task<IActionResult> deleteUser()
+        [HttpPost("Delete/{id}")]
+        public async Task<IActionResult> deleteUser(int id)
         {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
             var classes = await _repo.GetClasses(user.Id);
             foreach (var c in classes)
             {
@@ -136,8 +143,12 @@ namespace DotnetAPI.Controllers
         [HttpPost("Edit")]
         public async Task<IActionResult> editUser(UserForEditDto userForEditDto)
         {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userForEditDto.Id);
             _mapper.Map(userForEditDto, user);
+
+            var roles = await _userManager.GetRolesAsync(user);
+            await _userManager.RemoveFromRolesAsync(user, roles.ToArray());
+            await _userManager.AddToRoleAsync(user, user.Status);
 
             await _repo.Save();
             return Ok("Modified Successfully !");

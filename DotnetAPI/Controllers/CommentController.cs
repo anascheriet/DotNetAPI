@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -35,7 +36,7 @@ namespace DotnetAPI.Controllers
             _repo.Add(comment);
 
             if (await _repo.Save()) return Ok("Comment added successfully !");
-            return BadRequest("ERROR, Problem occured while adding the Comment");
+            throw new Exception("ERROR, Problem occured while adding the Comment");
 
         }
 
@@ -54,15 +55,15 @@ namespace DotnetAPI.Controllers
             return Ok(commentToReturn);
         }
 
-        [HttpPost("{comid}")]
-        public async Task<IActionResult> EditComment(int comid, CommentForAddDto commentForAddDto)
+        [HttpPost]
+        public async Task<IActionResult> EditComment(CommentForEditDto commentForAddDto)
         {
-            var com = await _repo.GetComment(comid);
+            var com = await _repo.GetComment(commentForAddDto.CommentId);
             _mapper.Map(commentForAddDto, com);
 
 
             if (await _repo.Save()) return Ok("Comment Modified successfully !");
-            return BadRequest("ERROR, Problem occured while modifying the Comment");
+            throw new Exception("ERROR, Problem occured while modifying the Comment");
 
         }
         [HttpPost("{comid}/delete")]
@@ -72,7 +73,7 @@ namespace DotnetAPI.Controllers
             _repo.Delete(com);
 
             if (await _repo.Save()) return Ok("Comment Deleted successfully !");
-            return BadRequest("ERROR, Problem occured while deleting the Comment");
+            throw new Exception("ERROR, Problem occured while deleting the Comment");
 
         }
     }
